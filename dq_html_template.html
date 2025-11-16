@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Data Quality Report</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; background: #f5f5f5; }
+    header { background: #0f766e; color: #fff; padding: 16px 24px; }
+    h1 { margin: 0; }
+    .summary { display: flex; gap: 16px; padding: 16px 24px; }
+    .card { background: #fff; border-radius: 12px; padding: 16px; flex: 1; box-shadow: 0 1px 4px rgba(15,118,110,0.08); }
+    .ok { color: #15803d; font-weight: 600; }
+    .fail { color: #b91c1c; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 8px 10px; font-size: 13px; }
+    th { background: #0f766e; color: #fff; text-align: left; }
+    tr:nth-child(even) { background: #f9fafb; }
+    .section { margin: 0 24px 24px 24px; }
+    .badge-pass { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 9999px; font-size: 11px; }
+    .badge-fail { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 9999px; font-size: 11px; }
+    details { margin-top: 8px; background: #fff; border-radius: 8px; padding: 8px 12px; }
+    summary { cursor: pointer; }
+    pre { background: #0f172a; color: #e2e8f0; padding: 8px; border-radius: 6px; overflow: auto; font-size: 12px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Data Quality Report</h1>
+  <p>Run at: {{ run_at }} | Tables: {{ total_tables }} | Checks: {{ total_checks }} | Passed: {{ passed_checks }} | Failed: {{ failed_checks }}</p>
+</header>
+
+<section class="summary">
+  <div class="card">
+    <h3>Total Checks</h3>
+    <p style="font-size:28px;">{{ total_checks }}</p>
+  </div>
+  <div class="card">
+    <h3>Passed</h3>
+    <p class="ok" style="font-size:28px;">{{ passed_checks }}</p>
+  </div>
+  <div class="card">
+    <h3>Failed</h3>
+    <p class="fail" style="font-size:28px;">{{ failed_checks }}</p>
+  </div>
+  <div class="card">
+    <h3>Pass %</h3>
+    <p style="font-size:28px;">{{ pass_rate }}%</p>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Checks by Table</h2>
+  <table>
+    <tr><th>Table</th><th>Total</th><th>Passed</th><th>Failed</th></tr>
+    {% for tbl in tables %}
+      <tr>
+        <td>{{ tbl.name }}</td>
+        <td>{{ tbl.total }}</td>
+        <td class="ok">{{ tbl.passed }}</td>
+        <td class="fail">{{ tbl.failed }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</section>
+
+<section class="section">
+  <h2>Detailed Checks</h2>
+  {% for chk in checks %}
+    <details>
+      <summary>
+        {% if chk.passed %}
+          <span class="badge-pass">PASS</span>
+        {% else %}
+          <span class="badge-fail">FAIL</span>
+        {% endif %}
+        {{ chk.table }}{% if chk.column %}.{{ chk.column }}{% endif %} — {{ chk.check_name }} — {{ chk.details }}
+      </summary>
+      {% if chk.failed_sample and chk.failed_sample|length > 0 %}
+        <p><strong>Failed rows (sample):</strong></p>
+        <pre>{{ chk.failed_sample }}</pre>
+      {% endif %}
+    </details>
+  {% endfor %}
+</section>
+
+</body>
+</html>
+
