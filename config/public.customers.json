@@ -1,0 +1,87 @@
+{
+  "table": "public.customers",
+  "description": "Customer master",
+  "pk": [
+    "customer_id"
+  ],
+  "load": {
+    "query": "SELECT * FROM public.customers"
+  },
+  "table_checks": [
+    {
+      "type": "row_count_min",
+      "min": 1
+    },
+    {
+      "type": "pk_not_null"
+    },
+    {
+      "type": "pk_unique"
+    }
+  ],
+  "columns": {
+    "customer_id": {
+      "checks": [
+        {
+          "type": "not_null"
+        }
+      ]
+    },
+    "full_name": {
+      "checks": [
+        {
+          "type": "not_null"
+        },
+        {
+          "type": "length_between",
+          "min": 3,
+          "max": 200
+        }
+      ]
+    },
+    "dob": {
+      "checks": [
+        {
+          "type": "timestamp_not_in_future"
+        }
+      ]
+    },
+    "pan_number": {
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
+        }
+      ]
+    },
+    "email": {
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+        }
+      ]
+    },
+    "mobile": {
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "^[6-9][0-9]{9}$"
+        }
+      ]
+    },
+    "kyc_status": {
+      "checks": [
+        {
+          "type": "in_set",
+          "values": [
+            "PENDING",
+            "IN_PROGRESS",
+            "VERIFIED",
+            "REJECTED"
+          ]
+        }
+      ]
+    }
+  }
+}
