@@ -1,0 +1,84 @@
+{
+  "table": "public.account_transactions",
+  "description": "Account ledger transactions",
+  "pk": [
+    "txn_id"
+  ],
+  "load": {
+    "query": "SELECT * FROM public.account_transactions"
+  },
+  "table_checks": [
+    {
+      "type": "row_count_min",
+      "min": 1
+    },
+    {
+      "type": "pk_not_null"
+    },
+    {
+      "type": "pk_unique"
+    }
+  ],
+  "columns": {
+    "txn_id": {
+      "checks": [
+        {
+          "type": "not_null"
+        }
+      ]
+    },
+    "account_id": {
+      "checks": [
+        {
+          "type": "not_null"
+        }
+      ]
+    },
+    "txn_timestamp": {
+      "checks": [
+        {
+          "type": "timestamp_not_in_future"
+        }
+      ]
+    },
+    "txn_type": {
+      "checks": [
+        {
+          "type": "in_set",
+          "values": [
+            "CREDIT",
+            "DEBIT",
+            "REVERSAL",
+            "FEE",
+            "INTEREST"
+          ]
+        }
+      ]
+    },
+    "amount": {
+      "checks": [
+        {
+          "type": "numeric_min",
+          "min": 0.0
+        }
+      ]
+    },
+    "is_reversal": {
+      "checks": [
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "related_txn_id": {
+      "checks": [
+        {
+          "type": "conditional_required",
+          "when_column": "is_reversal",
+          "when_value": true,
+          "required_column": "related_txn_id"
+        }
+      ]
+    }
+  }
+}
